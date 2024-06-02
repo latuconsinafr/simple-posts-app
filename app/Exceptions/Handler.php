@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -43,6 +44,16 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
+        $this->renderable(function (ValidationException $exception, $request) {
+            if (!$request->wantsJson()) {
+                return null;
+            }
+
+            throw InputValidationException::withMessages(
+                $exception->validator->getMessageBag()->getMessages()
+            );
+        });
+
         $this->reportable(function (Throwable $e) {
             //
         });

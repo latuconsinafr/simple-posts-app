@@ -2,8 +2,11 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -44,6 +47,25 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
+        // * 401
+        $this->renderable(function (AuthenticationException $exception, $request) {
+            if (!$request->wantsJson()) {
+                return null;
+            }
+
+            throw new UnauthorizedException();
+        });
+
+        // * 404
+        $this->renderable(function (NotFoundHttpException $exception, $request) {
+            if (!$request->wantsJson()) {
+                return null;
+            }
+
+            throw new NotFoundException();
+        });
+
+        // * 422
         $this->renderable(function (ValidationException $exception, $request) {
             if (!$request->wantsJson()) {
                 return null;

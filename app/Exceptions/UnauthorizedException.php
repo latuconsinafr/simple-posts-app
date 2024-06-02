@@ -2,18 +2,16 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\AuthenticationException;
 
-class InputValidationException extends ValidationException
+class UnauthorizedException extends AuthenticationException
 {
     /**
-     * InputValidationException constructor.
-     *
-     * @param \Illuminate\Contracts\Validation\Validator $validator
+     * UnauthorizedException constructor.
      */
-    public function __construct($validator)
+    public function __construct()
     {
-        parent::__construct($validator);
+        parent::__construct();
     }
 
     /**
@@ -25,11 +23,11 @@ class InputValidationException extends ValidationException
     public function render($request)
     {
         return response()->json([
-            'status'    => 422,
+            'status'    => 401,
             'timestamp' => now()->toDateTimeString(),
             'path'      => request()->path(),
             'success'   => false,
-            'message'   => $this->errors()
-        ], 422);
+            'message'   => 'Unauthorized'
+        ], 401);
     }
 }

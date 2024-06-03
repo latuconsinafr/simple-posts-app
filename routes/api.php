@@ -18,14 +18,23 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('auth')->controller(AuthController::class)->group(function () {
+    Route::middleware('auth:api')->get('', 'me');
+
     Route::post('register', 'register');
     Route::post('login', 'login');
 });
 
-Route::apiResource('posts', PostController::class)->middleware('auth:api');
-Route::get('/posts/{postId}/comments', [CommentController::class, 'indexByPostId'])->middleware('auth:api');
-Route::delete('/posts/{postId}/comments', [CommentController::class, 'destroyByPostId'])->middleware('auth:api');
+Route::middleware('auth:api')->group(function () {
+    Route::apiResource('posts', PostController::class);
+    Route::get('/posts/{postId}/comments', [CommentController::class, 'indexByPostId']);
+    Route::delete('/posts/{postId}/comments', [CommentController::class, 'destroyByPostId']);
 
-Route::apiResource('comments', CommentController::class)->middleware('auth:api');
+    Route::apiResource('comments', CommentController::class);
 
-Route::apiResource('users', UserController::class)->middleware('auth:api');
+    Route::middleware('checkRole:admin')->group(function () {
+        Route::apiResource('users', UserController::class);
+    });
+
+    Route::middleware('checkRole:user')->group(function () {
+    });
+});

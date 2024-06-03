@@ -26,6 +26,8 @@ class UpdateUserRequest extends FormRequest
         return [
             'name' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|required|string|email|max:255|unique:users',
+            'roles' => 'array',
+            'roles.*' => 'exists:roles,name',
         ];
     }
 }

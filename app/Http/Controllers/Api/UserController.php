@@ -17,9 +17,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        $posts = User::all();
-        $response = $posts->map(function ($post) {
-            return new UserResponse($post);
+        $users = User::all();
+        $response = $users->map(function ($user) {
+            return new UserResponse($user);
         });
 
         return $this->successResponse($response, 'Users retrieved successfully');
@@ -33,8 +33,13 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        $post = User::create($request->validated());
-        $response = new UserResponse($post);
+        $user = User::create($request->validated());
+
+        if ($request->has('roles')) {
+            $user->assignRole($request->roles);
+        }
+
+        $response = new UserResponse($user);
 
         return $this->successResponse($response, 'User created successfully', 201);
     }
@@ -47,8 +52,8 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $post = User::findOrFail($id);
-        $response = new UserResponse($post);
+        $user = User::findOrFail($id);
+        $response = new UserResponse($user);
 
         return $this->successResponse($response, 'User retrieved successfully.');
     }
@@ -62,10 +67,14 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, $id)
     {
-        $post = User::findOrFail($id);
-        $post->update($request->validated());
+        $user = User::findOrFail($id);
+        $user->update($request->validated());
 
-        $response = new UserResponse($post);
+        if ($request->has('roles')) {
+            $user->syncRoles($request->roles);
+        }
+
+        $response = new UserResponse($user);
 
         return $this->successResponse($response, 'User updated successfully');
     }
@@ -78,8 +87,8 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $post = User::findOrFail($id);
-        $post->delete();
+        $user = User::findOrFail($id);
+        $user->delete();
 
         return $this->successResponse(null, 'User deleted successfully', 204);
     }

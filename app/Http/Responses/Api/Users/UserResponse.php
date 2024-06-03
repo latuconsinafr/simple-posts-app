@@ -27,6 +27,13 @@ class UserResponse
      */
     public $email;
 
+     /**
+     * The roles for the user.
+     *
+     * @var array
+     */
+    public $roles;
+
     /**
      * The created_at for the user.
      *
@@ -51,6 +58,7 @@ class UserResponse
         $this->id = $user['id'];
         $this->name = $user['name'];
         $this->email = $user['email'];
+        $this->roles = $user->getRoleNames();
         $this->created_at = $user['created_at'];
         $this->updated_at = $user['updated_at'];
     }

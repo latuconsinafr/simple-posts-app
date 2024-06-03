@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,8 +23,9 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
 });
 
 Route::apiResource('posts', PostController::class)->middleware('auth:api');
+Route::get('/posts/{postId}/comments', [CommentController::class, 'indexByPostId'])->middleware('auth:api');
+Route::delete('/posts/{postId}/comments', [CommentController::class, 'destroyByPostId'])->middleware('auth:api');
 
 Route::apiResource('comments', CommentController::class)->middleware('auth:api');
 
-Route::get('/posts/{postId}/comments', [CommentController::class, 'indexByPostId']);
-Route::delete('/posts/{postId}/comments', [CommentController::class, 'destroyByPostId']);
+Route::apiResource('users', UserController::class)->middleware('auth:api');

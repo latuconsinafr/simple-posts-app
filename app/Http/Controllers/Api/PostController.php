@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Posts\StorePostRequest;
 use App\Http\Requests\Api\Posts\UpdatePostRequest;
+use App\Http\Responses\Api\Posts\PostResponse;
 use App\Models\Post;
 
 class PostController extends Controller
@@ -17,8 +18,11 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::all();
+        $response = $posts->map(function ($post) {
+            return new PostResponse($post);
+        });
 
-        return $this->successResponse($posts, 'Posts retrieved successfully');
+        return $this->successResponse($response, 'Posts retrieved successfully');
     }
 
     /**
@@ -30,8 +34,9 @@ class PostController extends Controller
     public function store(StorePostRequest $request)
     {
         $post = Post::create($request->validated());
+        $response = new PostResponse($post);
 
-        return $this->successResponse($post, 'Post created successfully', 201);
+        return $this->successResponse($response, 'Post created successfully', 201);
     }
 
     /**
@@ -43,8 +48,9 @@ class PostController extends Controller
     public function show($id)
     {
         $post = Post::findOrFail($id);
+        $response = new PostResponse($post);
 
-        return $this->successResponse($post, 'Post retrieved successfully.');
+        return $this->successResponse($response, 'Post retrieved successfully.');
     }
 
     /**
@@ -59,7 +65,9 @@ class PostController extends Controller
         $post = Post::findOrFail($id);
         $post->update($request->validated());
 
-        return $this->successResponse($post, 'Post updated successfully');
+        $response = new PostResponse($post);
+
+        return $this->successResponse($response, 'Post updated successfully');
     }
 
     /**

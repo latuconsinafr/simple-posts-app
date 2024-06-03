@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Comments\StoreCommentRequest;
 use App\Http\Requests\Api\Comments\UpdateCommentRequest;
+use App\Http\Responses\Api\Comments\CommentResponse;
 use App\Models\Comment;
 use App\Models\Post;
 
@@ -18,8 +19,11 @@ class CommentController extends Controller
     public function index()
     {
         $comments = Comment::all();
+        $response = $comments->map(function ($comment) {
+            return new CommentResponse($comment);
+        });
 
-        return $this->successResponse($comments, 'Comments retrieved successfully');
+        return $this->successResponse($response, 'Comments retrieved successfully');
     }
 
     /**
@@ -33,7 +37,11 @@ class CommentController extends Controller
         $post = Post::findOrFail($postId);
         $comments = $post->comments()->get();
 
-        return $this->successResponse($comments, 'Comments retrieved successfully');
+        $response = $comments->map(function ($comment) {
+            return new CommentResponse($comment);
+        });
+
+        return $this->successResponse($response, 'Comments retrieved successfully');
     }
 
     /**
@@ -45,8 +53,9 @@ class CommentController extends Controller
     public function store(StoreCommentRequest $request)
     {
         $comment = Comment::create($request->validated());
+        $response = new CommentResponse($comment);
 
-        return $this->successResponse($comment, 'Comment created successfully', 201);
+        return $this->successResponse($response, 'Comment created successfully', 201);
     }
 
     /**
@@ -58,8 +67,9 @@ class CommentController extends Controller
     public function show($id)
     {
         $comment = Comment::findOrFail($id);
+        $response = new CommentResponse($comment);
 
-        return $this->successResponse($comment, 'Comment retrieved successfully.');
+        return $this->successResponse($response, 'Comment retrieved successfully.');
     }
 
     /**
@@ -74,7 +84,9 @@ class CommentController extends Controller
         $comment = Comment::findOrFail($id);
         $comment->update($request->validated());
 
-        return $this->successResponse($comment, 'Comment updated successfully');
+        $response = new CommentResponse($comment);
+
+        return $this->successResponse($response, 'Comment updated successfully');
     }
 
     /**

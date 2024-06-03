@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\Users;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -23,10 +24,12 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules()
     {
+        $userId = $this->user ?? null;
+
         return [
             'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|string|email|max:255|unique:users',
-            'roles' => 'array',
+            'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $userId,
+            'roles' => 'required|array|min:1',
             'roles.*' => 'exists:roles,name',
         ];
     }
